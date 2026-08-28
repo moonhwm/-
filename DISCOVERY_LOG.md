@@ -3,11 +3,12 @@
 > data_cutoff: 2026-08-28 23:46 CST ｜ 记录人：Kimi (K3) ｜ 项目机型：ROG 幻16 2022 (GU603ZM)
 > conf 标注：empirical = 实测证据 ｜ estimated = 引擎/单次测量 ｜ assumed = 推断
 > 归档路径：github.com/moonhwm/- （规范建档库）｜ 结构化副本：Supabase discovery_log 表
+> 脱敏说明：2026-08-29 公开版本，局域网 IP 已泛化为 192.168.x.x；完整版存私有库 claw-local-inference-notes 与本地工作区
 
 ## 0. 终态架构
 
 ```
-手机/平板浏览器 or APK ──HTTP──> http://192.168.1.254:8000
+手机/平板浏览器 or APK ──HTTP──> http://192.168.x.x:8000
                                     ├── GET /            聊天网页（webchat.html）
                                     ├── GET /healthz     自检（配置回显）
                                     ├── GET /claw-local-assistant.apk  安装包下载
@@ -24,7 +25,7 @@ Claw Desktop fallback 链：云端主模型 → kimi-coding/k2p6 → local-bf16/
 | 时间 | 事件 | 关键证据 | conf |
 |---|---|---|---|
 | 05:17 | Claw Desktop 设备身份创建（identity/device.json），首次连接早于此前记录 | device.json ctime | empirical |
-| 06:20–06:34 | 下载 BF16-GGUF 全量包：gemma-4-E4B-it-BF16.gguf 15.05 GB + mmproj 992 MB → `C:\temp\g4models\`（原地下载，.cache 暂存目录同址创建于 05:57） | 文件时间戳 + .cache 结构 | empirical |
+| 06:20–06:34 | 下载 BF16-GGUF 全量包：gemma-4-E4B-it-BF16.gguf 15.05 GB + mmproj 992 MB（原地下载，.cache 暂存目录同址创建于 05:57） | 文件时间戳 + .cache 结构 | empirical |
 | 06:41 | 强行实装：停 Q4 服务，mmap 加载 BF16（15 GB 模型 > 16 GB 内存可用量） | serve.py | empirical |
 | 06:55 | 视觉功能接入：Gemma4ChatHandler + mmproj，支持 image_url 消息 | server_bf16.log 视觉推理记录 | empirical |
 | 07:10 | 企业微信机器人轮询器安全审查：纯标准库、只读拉取、无反弹；config 含明文 key 警告 | 源码审读（claw_poller.py 创建于 07:11:50 互证） | empirical |
@@ -35,7 +36,7 @@ Claw Desktop fallback 链：云端主模型 → kimi-coding/k2p6 → local-bf16/
 | 18:13 | 本地链路改走 BF16：新增 `local-bf16` provider（OpenAI 兼容 :8000）替换 ollama Q4 作 fallback；实测 44.3s/32tok | openclaw.json | empirical |
 | ~18:18 | **发现：桌面端 `L0 schema_migration` 每次网关启动强制重置 primary 与 kimi-coding models 列表**——改文件无效，K3 须在 Claw 设置 UI 选择；自定义 provider/fallback 不受影响（热重载日志确认） | main.log | empirical |
 | 18:22 | 开机自启：schtasks 权限被拒 → 改用 Startup 文件夹 bat（连踩 GBK 编码、LF 行尾两个 cmd 解析坑，最终 GBK+CRLF）→ 杀服务实测拉起成功 | bat 实测 | empirical |
-| 19:18 | widgetdesign 交接面板 Widget 生成并挂到「每日财经」看板 (canvas_4034d30b, mount_16e8f6ce) | Canvas.read | empirical |
+| 19:18 | widgetdesign 交接面板 Widget 生成并挂到「每日财经」看板 | Canvas.read | empirical |
 | 19:22 | 打包 APK：子代理从零装 Temurin JDK17 + Android SDK 34 + Gradle 8.9 + AGP 8.5.2（全在工作区 apk-build/）→ claw-local-assistant.apk 11.4 KB（单 Activity WebView 壳）；顺手修复 serve.py 缺 CORS 头 | aapt badging | empirical |
 | 19:39 | 用户管理员 PowerShell 加防火墙规则「Gemma4 BF16 8000」→ LAN 打通；**同期发现服务无声猝死模式**（日志停在启动成功无 traceback 反复死亡） | 截图 + netstat | empirical |
 | 19:46 | 对照实验定位猝死：shell 直接拉起稳定 vs detached 拉起必死 → 改走计划任务 XML 导入（绕开 PowerShell 引号转义坑）；19:48 用户导入成功，复检 4.5 分钟稳定 | 对照实验 + 截图 | empirical |
@@ -65,6 +66,8 @@ Claw Desktop fallback 链：云端主模型 → kimi-coding/k2p6 → local-bf16/
 | 核证⑥ | 09:47 事件旁证：095954 配置备份 + device.json 05:17 修正「首次连接」定性 | empirical（含部分保留） |
 | 核证⑦ | RLS 写实测：INSERT 401/42501 双 key 被拒、DELETE 影响 0 行（总数 34 不变） | empirical |
 | 核证⑧ | 移动取证：.cache/huggingface/download 暂存目录同址创建于 05:57，GGUF 原地下载未经移动 | empirical |
+| 核证⑨ | WebBridge 真实浏览器截图目检：README 与 DISCOVERY_LOG 网页端中文无乱码、表格成形、链接可点 | empirical |
+| 核证⑩ | 公开前脱敏：局域网 IP 泛化为 192.168.x.x，用户名路径经扫描为 0 出现 | empirical |
 
 ## 3. 关键断言登记（可证伪）
 
