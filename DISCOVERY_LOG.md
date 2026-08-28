@@ -1,6 +1,6 @@
 # Claw 本地推理栈建设 · 全量发现流程记录
 
-> data_cutoff: 2026-08-28 23:46 CST ｜ 记录人：Kimi (K3) ｜ 项目机型：ROG 幻16 2022 (GU603ZM)
+> data_cutoff: 2026-08-29 07:16 CST ｜ 记录人：Kimi (K3) ｜ 项目机型：ROG 幻16 2022 (GU603ZM)
 > conf 标注：empirical = 实测证据 ｜ estimated = 引擎/单次测量 ｜ assumed = 推断
 > 归档路径：github.com/moonhwm/- （规范建档库）｜ 结构化副本：Supabase discovery_log 表
 > 脱敏说明：2026-08-29 公开版本，局域网 IP 已泛化为 192.168.x.x；完整版存私有库 claw-local-inference-notes 与本地工作区
@@ -54,6 +54,15 @@ Claw Desktop fallback 链：云端主模型 → kimi-coding/k2p6 → local-bf16/
 | 23:28 | 手机截图「网站暂无响应」= 恰好撞上 kill 测试窗口（23:28:09–23:32:41），非故障 | 时间戳比对 | empirical |
 | 11:28 | 平板截图 ERR_ADDRESS_UNREACHABLE = 防火墙放行（19:42）前的历史状态，非当前状态 | 时间戳比对 | empirical |
 
+| 03:07+（08-29） | 死机事件后切双档位运营：Q4 全层上卡日常档（47.5 tok/s 零换页），BF16 转质量档保留；修 serve.py 预载 `<=0` 误判 `-1` 缺陷 | healthz + 长文 bench | empirical |
+| 03:30+ | 公网化（安全门先行）：serve.py 加 Bearer 鉴权（无钥 401），cloudflared 快速隧道上线，公网三向验证通过 | 公网 curl 实测 | empirical |
+| 04:10+ | 隧道纳入看门狗托管（120s×2），URL 变化自动推飞书群；kill 实测 4.5 分钟自动重建 | watchdog.log + lark ok:true | empirical |
+| 04:39+ | 固定域名决策：经济分析选定 A 方案——moonclaw.top（RDAP+NS 双查可注册，14 元/首年下单，实名审核中）；命名隧道切换器与看门狗双模式预置 | rdap.org 404 + 用户截图 | empirical |
+| 05:45+ | KV cache 路线 A 真机跑通：distilgpt2 单步加速 16.4×，两路径逐 token 一致 | kv-cache-lab/RESULTS.md | empirical |
+| 05:56+ | 沙盒前缀复用报告真机复核：5.4×/81.6%（玩具版 19.1×/94.8% 量级下修，机制成立） | PREFIX_REUSE_VERIFICATION.md | empirical |
+| 06:39+ | 路线 B′：生产栈 prompt cache TTFT 实测 34–35×（off 1.61–1.74s vs on 0.047–0.049s）；澄清 llama_cpp 快照缓存≠原地前缀复用 | TTFT_RESULTS.md | empirical |
+| 07:00+ | 磁盘 KV 快照种子验证：恢复 0.98s vs 重算 9.43s（9.6×），三路径逐 token 一致；0.85MB/tok 体积约束→长程 Agent 姿势=摘要压缩+关键节点快照 | SEED_RESULTS.md | empirical |
+
 ## 2. 归档后核证（2026-08-29 凌晨）
 
 | 项 | 内容 | 结论 |
@@ -68,6 +77,7 @@ Claw Desktop fallback 链：云端主模型 → kimi-coding/k2p6 → local-bf16/
 | 核证⑧ | 移动取证：.cache/huggingface/download 暂存目录同址创建于 05:57，GGUF 原地下载未经移动 | empirical |
 | 核证⑨ | WebBridge 真实浏览器截图目检：README 与 DISCOVERY_LOG 网页端中文无乱码、表格成形、链接可点 | empirical |
 | 核证⑩ | 公开前脱敏：局域网 IP 泛化为 192.168.x.x，用户名路径经扫描为 0 出现 | empirical |
+| 核证⑪⑫ | 双库敏感模式扫描零泄漏 + 扩展模式（手机号/银行卡等）补扫零命中；私有库写入分层同步规则 | empirical |
 
 ## 3. 关键断言登记（可证伪）
 
