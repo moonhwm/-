@@ -1,0 +1,9 @@
+{
+  "_comment": "Gemma-4 本地推理服务配置（幻16 2022 GU603ZM 调优）。所有键都可用同名环境变量覆盖：GEMMA4_REPO/GEMMA4_MODEL_FILE/GEMMA4_PORT/GEMMA4_N_CTX/GEMMA4_N_THREADS/GEMMA4_N_GPU_LAYERS/GEMMA4_FLASH_ATTN/GEMMA4_MODELS_DIR/GEMMA4_MMPROJ_FILE。改完重启服务生效（schtasks /run /tn Gemma4-BF16-Local）。",
+  "_hardware": "ROG Zephyrus M16 GU603ZM | i7-12700H 6P+8E/20T | RTX 3060 Laptop 6GB | 16GB DDR5",
+  "n_threads": 4,
+  "n_ctx": 3072,
+  "n_gpu_layers": 14,
+  "flash_attn": false,
+  "port": 8000
+}
